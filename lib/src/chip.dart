@@ -91,9 +91,7 @@ class C2Chip<T> extends StatelessWidget {
 
     final Color checkmarkColor = activeStyle.color;
 
-    final Color backgroundColor = isDark
-      ? style.color
-      : const Color(0x00000000);
+    final Color backgroundColor = style.color;
 
     final Color selectedBackgroundColor = isDark
       ? activeStyle.color
