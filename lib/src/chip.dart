@@ -89,7 +89,7 @@ class C2Chip<T> extends StatelessWidget {
       ? const Color(0x00000000)
       : textColor.withOpacity(effectiveStyle.borderOpacity ?? defaultBorderOpacity);
 
-    final Color checkmarkColor = activeStyle.color;
+    final Color checkmarkColor = Theme.of(context).primaryColor;
 
     final Color backgroundColor = style.color;
 
