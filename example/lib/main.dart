@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:chips_choice/chips_choice.dart';
 import 'package:async/async.dart';
+import 'package:chips_choice/chips_choice.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
 
@@ -34,13 +34,20 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // list of string options
   List<String> options = [
-    'News', 'Entertainment', 'Politics',
-    'Automotive', 'Sports', 'Education',
-    'Fashion', 'Travel', 'Food', 'Tech',
+    'News',
+    'Entertainment',
+    'Politics',
+    'Automotive',
+    'Sports',
+    'Education',
+    'Fashion',
+    'Travel',
+    'Food',
+    'Tech',
     'Science',
   ];
 
-  String user;
+  String? user;
   final usersMemoizer = AsyncMemoizer<List<C2Choice<String>>>();
 
   // Create a global key that uniquely identifies the Form widget
@@ -49,15 +56,17 @@ class _MyHomePageState extends State<MyHomePage> {
   // Note: This is a GlobalKey<FormState>,
   // not a GlobalKey<MyCustomFormState>.
   final formKey = GlobalKey<FormState>();
-  List<String> formValue;
+  List<String>? formValue;
 
   Future<List<C2Choice<String>>> getUsers() async {
-    String url = "https://randomuser.me/api/?inc=gender,name,nat,picture,email&results=25";
+    String url =
+        "https://randomuser.me/api/?inc=gender,name,nat,picture,email&results=25";
     Response res = await Dio().get(url);
     return C2Choice.listFrom<String, dynamic>(
-      source: res.data['results'],
+      source: res.data['results'].toList(),
       value: (index, item) => item['email'],
-      label: (index, item) => item['name']['first'] + ' ' + item['name']['last'],
+      label: (index, item) =>
+          item['name']['first'] + ' ' + item['name']['last'],
       meta: (index, item) => item,
     )..insert(0, C2Choice<String>(value: 'all', label: 'All'));
   }
@@ -324,7 +333,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             initialValue: formValue,
                             onSaved: (val) => setState(() => formValue = val),
                             validator: (value) {
-                              if (value?.isEmpty ?? value == null) {
+                              if (value == null || value.isEmpty) {
                                 return 'Please select some categories';
                               }
                               if (value.length > 5) {
@@ -340,7 +349,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                     child: ChipsChoice<String>.multiple(
                                       value: state.value,
                                       onChanged: (val) => state.didChange(val),
-                                      choiceItems: C2Choice.listFrom<String, String>(
+                                      choiceItems:
+                                          C2Choice.listFrom<String, String>(
                                         source: options,
                                         value: (i, v) => v.toLowerCase(),
                                         label: (i, v) => v,
@@ -360,14 +370,14 @@ class _MyHomePageState extends State<MyHomePage> {
                                     padding: const EdgeInsets.fromLTRB(15, 0, 15, 10),
                                     alignment: Alignment.centerLeft,
                                     child: Text(
-                                      state.errorText ?? state.value.length.toString() + '/5 selected',
-                                      style: TextStyle(
-                                        color: state.hasError
-                                          ? Colors.redAccent
-                                          : Colors.green
-                                      ),
-                                    )
-                                  )
+                                        state.errorText ??
+                                            state.value!.length.toString() +
+                                                '/5 selected',
+                                        style: TextStyle(
+                                            color: state.hasError
+                                                ? Colors.redAccent
+                                                : Colors.green),
+                                      ))
                                 ],
                               );
                             },
@@ -395,13 +405,12 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.blueAccent,
                                   textColor: Colors.white,
                                   onPressed: () {
-                                    // Validate returns true if the form is valid, or false otherwise.
-                                    if (formKey.currentState.validate()) {
-                                      // If the form is valid, save the value.
-                                      formKey.currentState.save();
-                                    }
-                                  }
-                                ),
+                                      // Validate returns true if the form is valid, or false otherwise.
+                                      if (formKey.currentState!.validate()) {
+                                        // If the form is valid, save the value.
+                                        formKey.currentState!.save();
+                                      }
+                                    }),
                               ],
                             ),
                           ),
@@ -469,24 +478,23 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class CustomChip extends StatelessWidget {
-
   final String label;
-  final Color color;
-  final double width;
-  final double height;
-  final EdgeInsetsGeometry margin;
+  final Color? color;
+  final double? width;
+  final double? height;
+  final EdgeInsetsGeometry? margin;
   final bool selected;
-  final Function(bool selected) onSelect;
+  final Function(bool selected)? onSelect;
 
   CustomChip({
-    Key key,
-    this.label,
+    Key? key,
+    required this.label,
     this.color,
     this.width,
     this.height,
     this.margin,
-    this.selected,
-    this.onSelect,
+    required this.selected,
+    required this.onSelect,
   }) : super(key: key);
 
   @override
@@ -508,18 +516,17 @@ class CustomChip extends StatelessWidget {
         ),
       ),
       child: InkWell(
-        onTap: () => onSelect(!selected),
+        onTap: () => onSelect?.call(!selected),
         child: Stack(
           alignment: Alignment.center,
           children: <Widget>[
             Visibility(
-              visible: selected,
-              child: const Icon(
-                Icons.check_circle_outline,
-                color: Colors.white,
-                size: 32,
-              )
-            ),
+                visible: selected,
+                child: const Icon(
+                  Icons.check_circle_outline,
+                  color: Colors.white,
+                  size: 32,
+                )),
             Positioned(
               left: 9,
               right: 9,
@@ -548,9 +555,9 @@ class Content extends StatefulWidget {
   final Widget child;
 
   Content({
-    Key key,
-    @required this.title,
-    @required this.child,
+    Key? key,
+    required this.title,
+    required this.child,
   }) : super(key: key);
 
   @override
@@ -605,7 +612,10 @@ void _about(BuildContext context) {
           ListTile(
             title: Text(
               'chips_choice',
-              style: Theme.of(context).textTheme.headline5.copyWith(color: Colors.black87),
+              style: Theme.of(context)
+                  .textTheme
+                  .headline5!
+                  .copyWith(color: Colors.black87),
             ),
             subtitle: const Text('by davigmacode'),
             trailing: IconButton(
@@ -622,7 +632,10 @@ void _about(BuildContext context) {
                 children: <Widget>[
                   Text(
                     'Easy way to provide a single or multiple choice chips.',
-                    style: Theme.of(context).textTheme.bodyText2.copyWith(color: Colors.black54),
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyText2!
+                        .copyWith(color: Colors.black54),
                   ),
                   Container(height: 15),
                 ],
